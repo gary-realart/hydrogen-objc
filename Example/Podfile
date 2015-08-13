@@ -1,0 +1,9 @@
+source 'https://github.com/CocoaPods/Specs.git'
+use_frameworks!
+
+
+target 'hydrogen-objc_Tests', :exclusive => true do
+  pod "hydrogen-objc", :path => "../"
+
+  
+end
