@@ -26,4 +26,4 @@ Nathan Sizemore, nathanrsizemore@gmail.com
 
 ## License
 
-hydrogen-objc is available under the MIT license. See the LICENSE file for more info.
+hydrogen-objc is available under the MPL-2.0 license. See the LICENSE file for more info.
