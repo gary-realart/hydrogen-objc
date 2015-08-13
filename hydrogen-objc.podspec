@@ -9,14 +9,14 @@
 
 Pod::Spec.new do |s|
   s.name             = "hydrogen-objc"
-  s.version          = "0.1.2"
+  s.version          = "0.1.3"
   s.summary          = "Hydrogen Obj-C client"
   s.description      = <<-DESC
                        Obj-C SDK for building a Hydrogen client.
                        DESC
   s.homepage         = "https://github.com/nathansizemore/hydrogen-objc"
   # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
-  s.license          = 'MPL 2.0'
+  s.license          = { :type => 'MPL 2.0' }
   s.author           = { "Nathan Sizemore" => "nathanrsizemore@gmail.com" }
   s.source           = { :git => "https://github.com/nathansizemore/hydrogen-objc.git", :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/nathansizemore'
