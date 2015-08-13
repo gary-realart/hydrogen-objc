@@ -164,7 +164,7 @@
             NSError *error = [self.outputStream streamError];
             NSLog(@"Error writing to stream");
             NSLog(@"domain: %@", error.domain);
-            NSLog(@"code: %ld", error.code);
+            NSLog(@"code: %ld", (long)error.code);
             [self.streamDelegate onError:E_ON_WRITE];
             free(nBufferOrigin);
             return;

@@ -12,10 +12,7 @@ Pod::Spec.new do |s|
   s.version          = "0.1.0"
   s.summary          = "Hydrogen Obj-C client"
   s.description      = <<-DESC
-                       An optional longer description of hydrogen-objc
-
-                       * Markdown format.
-                       * Don't worry about the indent, we strip it!
+                       Obj-C SDK for building a Hydrogen client.
                        DESC
   s.homepage         = "https://github.com/nathansizemore/hydrogen-objc"
   # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
