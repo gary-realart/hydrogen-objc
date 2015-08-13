@@ -1,0 +1,25 @@
+{
+  "name": "hydrogen-objc",
+  "version": "0.1.0",
+  "summary": "A short description of hydrogen-objc.",
+  "description": "                       An optional longer description of hydrogen-objc\n\n                       * Markdown format.\n                       * Don't worry about the indent, we strip it!\n",
+  "homepage": "https://github.com/<GITHUB_USERNAME>/hydrogen-objc",
+  "license": "MIT",
+  "authors": {
+    "Nathan Sizemore": "nathanrsizemore@gmail.com"
+  },
+  "source": {
+    "git": "https://github.com/<GITHUB_USERNAME>/hydrogen-objc.git",
+    "tag": "0.1.0"
+  },
+  "platforms": {
+    "ios": "7.0"
+  },
+  "requires_arc": true,
+  "source_files": "Pod/Classes/**/*",
+  "resource_bundles": {
+    "hydrogen-objc": [
+      "Pod/Assets/*.png"
+    ]
+  }
+}

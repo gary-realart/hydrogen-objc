@@ -10,19 +10,19 @@
 Pod::Spec.new do |s|
   s.name             = "hydrogen-objc"
   s.version          = "0.1.0"
-  s.summary          = "A short description of hydrogen-objc."
+  s.summary          = "Hydrogen Obj-C client"
   s.description      = <<-DESC
                        An optional longer description of hydrogen-objc
 
                        * Markdown format.
                        * Don't worry about the indent, we strip it!
                        DESC
-  s.homepage         = "https://github.com/<GITHUB_USERNAME>/hydrogen-objc"
+  s.homepage         = "https://github.com/nathansizemore/hydrogen-objc"
   # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
-  s.license          = 'MIT'
+  s.license          = 'MPL-2.0'
   s.author           = { "Nathan Sizemore" => "nathanrsizemore@gmail.com" }
-  s.source           = { :git => "https://github.com/<GITHUB_USERNAME>/hydrogen-objc.git", :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
+  s.source           = { :git => "https://github.com/nathansizemore/hydrogen-objc.git", :tag => s.version.to_s }
+  s.social_media_url = 'https://twitter.com/nathansizemore'
 
   s.platform     = :ios, '7.0'
   s.requires_arc = true

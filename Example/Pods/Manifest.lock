@@ -1,0 +1,14 @@
+PODS:
+  - hydrogen-objc (0.1.0)
+
+DEPENDENCIES:
+  - hydrogen-objc (from `../`)
+
+EXTERNAL SOURCES:
+  hydrogen-objc:
+    :path: ../
+
+SPEC CHECKSUMS:
+  hydrogen-objc: ac6fb1c90136aec58581bfbcb43c272eeaae680a
+
+COCOAPODS: 0.37.2
