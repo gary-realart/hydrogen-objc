@@ -31,7 +31,7 @@
 
 @implementation HydrogenClient
 
-- (id)initWithDataReceivedFunction:(void (*)(const char *))dataReceivedFunction
+- (id)initWithDataReceivedFunction:(void (*)(const uint8_t *))dataReceivedFunction
               andOnConnectFunction:(void (*)())onConnectFunction
            andOnDisconnectFunction:(void (*)())onDisconnectFunction
                 andOnErrorFunction:(void (*)(HydrogenResult))onErrorFunction
@@ -61,7 +61,7 @@
     return self;
 }
 
-- (id)initWithDataReceivedBlock:(void (^)(const char *))dataReceivedBlock
+- (id)initWithDataReceivedBlock:(void (^)(const uint8_t *))dataReceivedBlock
               andOnConnectBlock:(void (^)())onConnectBlock
            andOnDisconnectBlock:(void (^)())onDisconnectBlock
                 andOnErrorBlock:(void (^)(HydrogenResult))onErrorBlock
@@ -80,7 +80,7 @@
 }
 
 - (void)connectToHostWithAddress:(NSString *)hostAddress
-                         andPort:(unsigned short)port
+                         andPort:(uint16_t)port
 {
     CFReadStreamRef readStream;
     CFWriteStreamRef writeStream;
