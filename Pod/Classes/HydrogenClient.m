@@ -94,8 +94,10 @@
         NSLog(@"Unable to create read and write streams...");
         return;
     }
+    
     NSInputStream *inputStream;
     NSOutputStream *outputStream;
+    
     inputStream = (__bridge_transfer NSInputStream *)readStream;
     outputStream = (__bridge_transfer NSOutputStream *)writeStream;
     

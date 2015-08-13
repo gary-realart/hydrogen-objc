@@ -33,18 +33,26 @@
 
 @interface HydrogenClient : NSObject <HYNbkqStream>
 
+// Initializes the client with C style function pointers
 - (id)initWithDataReceivedFunction:(void (*)(const uint8_t *))dataReceivedFunction
               andOnConnectFunction:(void (*)())onConnectFunction
            andOnDisconnectFunction:(void (*)())onDisconnectFunction
                 andOnErrorFunction:(void (*)(HydrogenResult))onErrorFunction;
+// Initializes the client with Obj-C style delegate/protocol messaging
 - (id)initWithHydrogenDelegate:(id<Hydrogen>)delegate;
+// Initializes the client with Obj-C style blocks
 - (id)initWithDataReceivedBlock:(void (^)(const uint8_t *))dataReceivedBlock
               andOnConnectBlock:(void (^)())onConnectBlock
            andOnDisconnectBlock:(void (^)())onDisconnectBlock
                 andOnErrorBlock:(void (^)(HydrogenResult))onErrorBlock;
+// Attempts to connect to the given Ipv4 address and port
+// On failure, the onError callback is called
 - (void)connectToHostWithAddress:(NSString *)hostAddress
                          andPort:(uint16_t)port;
+// Attempts to write the complete buffer to the stream
+// On failure E_ON_WRITE error is returned
 - (void)write:(NSData *)buffer;
+// Disconnects from the current connected host
 - (void)disconnect;
 
 @end

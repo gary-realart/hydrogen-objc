@@ -17,7 +17,9 @@
 
 @interface HYMessage : NSObject
 
+// Represents the current payload length
 @property uint16_t len;
+// Represents the current payload
 @property (strong, nonatomic) NSData *payload;
 
 @end

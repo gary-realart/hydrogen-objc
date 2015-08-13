@@ -15,24 +15,23 @@
 #ifndef Pods_HydrogenTypes_h
 #define Pods_HydrogenTypes_h
 
+// State pf current NSInputStream
 typedef enum
 {
+    // Stream is reading the payload len frame
     PayloadLen,
+    // Stream is reading the payload
     Payload
 } ReadState;
 
+// Represents the type of callbacks the client will execute
 typedef enum
 {
-    ReadResultOk,
-    ReadResultEof,
-    ReadResultErr,
-    ReadResultAgain
-} HydrogenReadResult;
-
-typedef enum
-{
+    // Obj-C style block as callbacks
     EE_BLOCK,
+    // Obj-C style delegates as callbacks
     EE_DELEGATE,
+    // C style function pointers as callbacks
     EE_FUNCTION
 } ExecutionEnvironment;
 

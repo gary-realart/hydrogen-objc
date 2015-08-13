@@ -32,12 +32,16 @@
 
 @interface HYNbkqStream : NSObject <NSStreamDelegate>
 
+// Initializes the stream.
+// If the streams are not in NSStreamStatusNotOpen state when
+// received, they will be opened, assigned a delegate, and default
+// runloop mode
 - (id)initWithInputStream:(NSInputStream *)input
           andOutputStream:(NSOutputStream *)output
   andHYNbkqStreamDelegate:(id<HYNbkqStream>)delegate;
-
+// Writes buffer to the outputStream
 - (void)write:(NSData *)buffer;
-
+// Closes the stream
 - (void)close;
 
 @end

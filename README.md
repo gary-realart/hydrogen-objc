@@ -7,9 +7,58 @@
 
 ## Usage
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
+~~~objc
+// Initialize a client
+//
+// Initialization can be done with C function pointers, Obj-C delegates, or
+// by passing in Obj-C blocks.
+self.client = [[HydrogenClient alloc] initWithHydrogenDelegate:self];
 
-## Requirements
+// Connect to a hydrogen server
+NSString *hostAddress = @"127.0.0.1";
+uint16_t port = 1337;
+[self.client connectToHostWithAddress:hostAddress andPort:port];
+
+// Send a thing to server
+const char *ping = "ping";
+NSData *buffer = [[NSData alloc] initWithBytes:ping length:4];
+[self.client write:buffer];
+
+// Disconnect
+[self.client disconnect];
+
+
+// Hydrogen Protocol
+
+// Called when connection to host has been established
+- (void)onConnected
+{
+    NSLog(@"onConnected");
+}
+
+// Called when connection to host has been lost
+- (void)onDisconnected
+{
+    NSLog(@"onDisconnected");
+}
+
+// Called when data is received from host
+- (void)onDataReceived:(const uint8_t *)buffer
+{
+    NSLog(@"onDataReceived");
+
+    // Assuming it's valid ASCII
+    NSLog(@"Host said: %s", (const char *)buffer);
+}
+
+// Called when an error has been encountered
+- (void)onError:(HydrogenResult)error
+{
+    // You should probably disconnect and reconnect here
+    // instead of just logging... :)
+    NSLog(@"onError");
+}
+~~~
 
 ## Installation
 
