@@ -61,10 +61,11 @@
 
 - (void)calcPayloadLen
 {
-    unsigned short len = 0;
+    unsigned short len;
+    const unsigned short mask = 0xFFFF;
     const unsigned char *bytes = [self.cBuffer bytes];
-    len = len | *bytes;
-    len = (len << 8) | *(bytes + 1);
+    len = ((*bytes) << 8) & mask;
+    len = len | *(bytes + 1);
     self.cMsg.len = len;
 }
 

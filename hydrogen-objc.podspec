@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "hydrogen-objc"
-  s.version          = "0.1.6"
+  s.version          = "0.1.7"
   s.summary          = "Hydrogen Obj-C client"
   s.description      = <<-DESC
                        Obj-C SDK for building a Hydrogen client.
