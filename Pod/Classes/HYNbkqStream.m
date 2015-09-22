@@ -25,6 +25,11 @@
 @property (nonatomic) HYReadBuffer *buffer;
 @property (nonatomic) id<HYNbkqStream> streamDelegate;
 
+// NSStreamEvent likes to send a notification for each side of the
+// stream (in and out), this is here to provide a count so that the
+// end user only gets one call back called once the both streams are connected
+@property (nonatomic) uint8_t streamsConnected;
+
 @end
 
 
@@ -41,6 +46,7 @@
     self = [super init];
     if (self)
     {
+        self.streamsConnected = 0;
         self.inputStream = input;
         self.outputStream = output;
         int result = [self ensureStreamsAreAlive];
@@ -275,7 +281,11 @@
 {
     if (streamEvent == NSStreamEventOpenCompleted)
     {
-        [self.streamDelegate onConnected];
+        self.streamsConnected++;
+        if (self.streamsConnected > 1)
+        {
+            [self.streamDelegate onConnected];
+        }
     }
     else if (streamEvent == NSStreamEventHasBytesAvailable)
     {

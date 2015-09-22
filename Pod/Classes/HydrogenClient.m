@@ -124,7 +124,6 @@
 // Called when connection to host has been established
 - (void)onConnected
 {
-    NSLog(@"on_connect");
     switch (self.environment)
     {
         case EE_BLOCK:
@@ -145,7 +144,6 @@
 // Called when connection to host has been lost
 - (void)onDisconnected
 {
-    NSLog(@"on_disconnect");
     switch (self.environment)
     {
         case EE_BLOCK:
@@ -166,7 +164,6 @@
 // Called when data is received from host
 - (void)onDataReceived:(const uint8_t *)buffer withLen:(const size_t)len
 {
-    NSLog(@"data_received");
     switch (self.environment)
     {
         case EE_BLOCK:
@@ -187,7 +184,6 @@
 // Called when an error has been encountered
 - (void)onError:(HydrogenResult)error
 {
-    NSLog(@"on_error");
     switch (self.environment)
     {
         case EE_BLOCK:
