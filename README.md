@@ -43,19 +43,14 @@ NSData *buffer = [[NSData alloc] initWithBytes:ping length:4];
 }
 
 // Called when data is received from host
-- (void)onDataReceived:(const uint8_t *)buffer
+- (void)onDataReceived:(const uint8_t *)buffer withLen:(const size_t)len
 {
     NSLog(@"onDataReceived");
-
-    // Assuming it's valid ASCII
-    NSLog(@"Host said: %s", (const char *)buffer);
 }
 
 // Called when an error has been encountered
 - (void)onError:(HydrogenResult)error
 {
-    // You should probably disconnect and reconnect here
-    // instead of just logging... :)
     NSLog(@"onError");
 }
 ~~~
