@@ -24,7 +24,7 @@
 // Called when connection to host has been lost
 - (void)onDisconnected;
 // Called when data is received from host
-- (void)onDataReceived:(const uint8_t *)buffer;
+- (void)onDataReceived:(const uint8_t *)buffer withLen:(const size_t)len;
 // Called when an error has been encountered
 - (void)onError:(HydrogenResult)error;
 
@@ -34,14 +34,14 @@
 @interface HydrogenClient : NSObject <HYNbkqStream>
 
 // Initializes the client with C style function pointers
-- (id)initWithDataReceivedFunction:(void (*)(const uint8_t *))dataReceivedFunction
+- (id)initWithDataReceivedFunction:(void (*)(const uint8_t *, const size_t))dataReceivedFunction
               andOnConnectFunction:(void (*)())onConnectFunction
            andOnDisconnectFunction:(void (*)())onDisconnectFunction
                 andOnErrorFunction:(void (*)(HydrogenResult))onErrorFunction;
 // Initializes the client with Obj-C style delegate/protocol messaging
 - (id)initWithHydrogenDelegate:(id<Hydrogen>)delegate;
 // Initializes the client with Obj-C style blocks
-- (id)initWithDataReceivedBlock:(void (^)(const uint8_t *))dataReceivedBlock
+- (id)initWithDataReceivedBlock:(void (^)(const uint8_t *, const size_t))dataReceivedBlock
               andOnConnectBlock:(void (^)())onConnectBlock
            andOnDisconnectBlock:(void (^)())onDisconnectBlock
                 andOnErrorBlock:(void (^)(HydrogenResult))onErrorBlock;
@@ -51,7 +51,10 @@
                          andPort:(uint16_t)port;
 // Attempts to write the complete buffer to the stream
 // On failure E_ON_WRITE error is returned
-- (void)write:(NSData *)buffer;
+- (void)writeData:(NSData *)buffer;
+// Attempts to write until len, to the stream
+// buffer must be initialized and guaranteed to be at least len bytes long
+- (void)writeBytes:(const uint8_t *)buffer toLen:(const size_t)len;
 // Disconnects from the current connected host
 - (void)disconnect;
 

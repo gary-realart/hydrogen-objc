@@ -23,7 +23,7 @@
 // Called when connection to host has been lost
 - (void)onDisconnected;
 // Called when data is received from host
-- (void)onDataReceived:(const uint8_t *)buffer;
+- (void)onDataReceived:(const uint8_t *)buffer withLen:(const size_t)len;
 // Called when an error has been encountered
 - (void)onError:(HydrogenResult)error;
 
@@ -41,6 +41,8 @@
   andHYNbkqStreamDelegate:(id<HYNbkqStream>)delegate;
 // Writes buffer to the outputStream
 - (void)write:(NSData *)buffer;
+// Writes len bytes to outputstream
+- (void)writeBytes:(const uint8_t *)buffer toLen:(const size_t)len;
 // Closes the stream
 - (void)close;
 

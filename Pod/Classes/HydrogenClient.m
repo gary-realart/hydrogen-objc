@@ -31,7 +31,7 @@
 
 @implementation HydrogenClient
 
-- (id)initWithDataReceivedFunction:(void (*)(const uint8_t *))dataReceivedFunction
+- (id)initWithDataReceivedFunction:(void (*)(const uint8_t *, const size_t len))dataReceivedFunction
               andOnConnectFunction:(void (*)())onConnectFunction
            andOnDisconnectFunction:(void (*)())onDisconnectFunction
                 andOnErrorFunction:(void (*)(HydrogenResult))onErrorFunction
@@ -61,7 +61,7 @@
     return self;
 }
 
-- (id)initWithDataReceivedBlock:(void (^)(const uint8_t *))dataReceivedBlock
+- (id)initWithDataReceivedBlock:(void (^)(const uint8_t *, const size_t))dataReceivedBlock
               andOnConnectBlock:(void (^)())onConnectBlock
            andOnDisconnectBlock:(void (^)())onDisconnectBlock
                 andOnErrorBlock:(void (^)(HydrogenResult))onErrorBlock
@@ -111,9 +111,14 @@
     [self.stream close];
 }
 
-- (void)write:(NSData *)buffer
+- (void)writeData:(NSData *)buffer
 {
     [self.stream write:buffer];
+}
+
+- (void)writeBytes:(const uint8_t *)buffer toLen:(const size_t)len
+{
+    [self.stream writeBytes:buffer toLen:len];
 }
 
 // Called when connection to host has been established
@@ -159,19 +164,19 @@
 }
 
 // Called when data is received from host
-- (void)onDataReceived:(const uint8_t *)buffer
+- (void)onDataReceived:(const uint8_t *)buffer withLen:(const size_t)len
 {
     NSLog(@"data_received");
     switch (self.environment)
     {
         case EE_BLOCK:
-            ((__bridge void (^)(const uint8_t *))self.onDataReceivedHandler)(buffer);
+            ((__bridge void (^)(const uint8_t *, const size_t))self.onDataReceivedHandler)(buffer, len);
             break;
         case EE_DELEGATE:
-            [self.hydrogenDelegate onDataReceived:buffer];
+            [self.hydrogenDelegate onDataReceived:buffer withLen:len];
             break;
         case EE_FUNCTION:
-            ((void (*)(const uint8_t *))self.onDataReceivedHandler)(buffer);
+            ((void (*)(const uint8_t *, const size_t len))self.onDataReceivedHandler)(buffer, len);
             break;
             
         default:

@@ -136,7 +136,8 @@
                 NSParameterAssert(NULL);
             }
             NSData *internalPayload = (NSData *)internalBuffer[0];
-            [self.streamDelegate onDataReceived:(const uint8_t *)[internalPayload bytes]];
+            [self.streamDelegate onDataReceived:(const uint8_t *)[internalPayload bytes]
+                                        withLen:(const size_t)[internalPayload length]];
         }
     }
 }
@@ -156,6 +157,61 @@
     
     uint zeroWrittenAttempts = 0;
     size_t bytesRemaining = buffer.length + 2;
+    while (bytesRemaining > 0)
+    {
+        int numWritten = (int)[self.outputStream write:nBuffer maxLength:bytesRemaining];
+        if (numWritten == -1)
+        {
+            NSError *error = [self.outputStream streamError];
+            NSLog(@"Error writing to stream");
+            NSLog(@"domain: %@", error.domain);
+            NSLog(@"code: %ld", (long)error.code);
+            [self.streamDelegate onError:E_ON_WRITE];
+            free(nBufferOrigin);
+            return;
+        }
+        
+        if (numWritten == 0)
+        {
+            zeroWrittenAttempts++;
+        }
+        
+        if (zeroWrittenAttempts > 2)
+        {
+            NSLog(@"3 attempts to write returned 0, assuming EOF");
+            [self.streamDelegate onError:E_EOF];
+            free(nBufferOrigin);
+            return;
+        }
+        
+        if (numWritten > 0)
+        {
+            bytesRemaining -= numWritten;
+            nBuffer += numWritten;
+            if (zeroWrittenAttempts > 0)
+            {
+                zeroWrittenAttempts--;
+            }
+        }
+    }
+    
+    free(nBufferOrigin);
+}
+
+- (void)writeBytes:(const uint8_t *)buffer toLen:(const size_t)len
+{
+    uint8_t *nBuffer = (uint8_t *)calloc(len + 2, sizeof(uint8_t));
+    uint8_t *nBufferOrigin = nBuffer;
+    nBuffer[0] = (uint16_t)len & 0xFFFF << 8;
+    nBuffer[1] = (uint16_t)len & 0xFFFF;
+    
+    for (int x = 0; x < len; x++)
+    {
+        nBuffer[x + 2] = *(buffer + x);
+    }
+    
+    uint zeroWrittenAttempts = 0;
+    size_t bytesRemaining = len + 2;
     while (bytesRemaining > 0)
     {
         int numWritten = (int)[self.outputStream write:nBuffer maxLength:bytesRemaining];
