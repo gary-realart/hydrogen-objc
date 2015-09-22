@@ -273,7 +273,11 @@
 - (void)stream:(NSStream *)theStream
    handleEvent:(NSStreamEvent)streamEvent
 {
-    if (streamEvent == NSStreamEventHasBytesAvailable)
+    if (streamEvent == NSStreamEventOpenCompleted)
+    {
+        [self.streamDelegate onConnected];
+    }
+    else if (streamEvent == NSStreamEventHasBytesAvailable)
     {
         [self read];
     }
@@ -284,10 +288,6 @@
     else if (streamEvent == NSStreamEventErrorOccurred)
     {
         [self.streamDelegate onError:E_STREAM];
-    }
-    else
-    {
-        NSLog(@"Stream event: %lu", (unsigned long)streamEvent);
     }
 }
 
