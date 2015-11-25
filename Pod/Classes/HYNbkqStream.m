@@ -105,7 +105,7 @@
 - (void)read
 {
     uint8_t *tbuf = calloc(512, sizeof(uint8_t));
-    const int num_read = [self.inputStream read:tbuf maxLength:512];
+    const int num_read = (int)[self.inputStream read:tbuf maxLength:512];
     if (num_read < 0)
     {
         [self.streamDelegate onError:E_ON_READ];
@@ -118,13 +118,13 @@
     uint8_t *buf = calloc([self.scratch count] + num_read, sizeof(uint8_t));
     for (int x = 0; x < [self.scratch count]; x++)
     {
-        buf[x] = self.scratch[x];
+        buf[x] = (uint8_t)[self.scratch[x] intValue];
     }
     memcpy(buf + [self.scratch count], tbuf, num_read);
     free(tbuf);
     
     size_t seek_pos = 0;
-    const uint32_t len = num_read + [self.scratch count];
+    const size_t len = num_read + [self.scratch count];
     
     if (self.state == Start)
     {
@@ -205,7 +205,7 @@
             uint8_t *payload = calloc(payload_len, sizeof(uint8_t));
             for (int x = 3; x < [self.buffer count]; x++)
             {
-                payload[x - 3] = self.buffer[x];
+                payload[x - 3] = (uint8_t)[self.buffer[x] intValue];
             }
             self.state = Start;
             self.buffer = [[NSMutableArray alloc] init];
@@ -213,7 +213,7 @@
             // Dump remaining into scratch space
             offset++;
             self.scratch = [[NSMutableArray alloc] init];
-            for (int x = offset; x < len; x++)
+            for (size_t x = offset; x < len; x++)
             {
                 [self.scratch addObject:[NSNumber numberWithUnsignedChar:buf[x]]];
             }
@@ -231,7 +231,7 @@
         self.state = Start;
         self.buffer = [[NSMutableArray alloc] init];
         self.scratch = [[NSMutableArray alloc] init];
-        for (int x = offset; x < len; x++)
+        for (size_t x = offset; x < len; x++)
         {
             [self.scratch addObject:[NSNumber numberWithUnsignedChar:buf[x]]];
         }
