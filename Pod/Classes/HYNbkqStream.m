@@ -104,8 +104,9 @@
 
 - (void)read
 {
-    uint8_t *tbuf = calloc(512, sizeof(uint8_t));
-    const int num_read = (int)[self.inputStream read:tbuf maxLength:512];
+
+    uint8_t *read_buf = calloc(512, sizeof(uint8_t));
+    const int num_read = (int)[self.inputStream read:read_buf maxLength:512];
     if (num_read < 0)
     {
         [self.streamDelegate onError:E_ON_READ];
@@ -114,35 +115,49 @@
     {
         [self.streamDelegate onError:E_EOF];
     }
+
     
-    uint8_t *buf = calloc([self.scratch count] + num_read, sizeof(uint8_t));
+    // Transfer what we have in our scratch space into a new buffer with the data
+    // we just read in
+    const size_t len = [self.scratch count] + num_read;
+
+    uint8_t *buf = calloc(len, sizeof(uint8_t));
     for (int x = 0; x < [self.scratch count]; x++)
     {
         buf[x] = (uint8_t)[self.scratch[x] intValue];
     }
-    memcpy(buf + [self.scratch count], tbuf, num_read);
-    free(tbuf);
+    for (int x = 0; x < num_read; x++)
+    {
+        buf[x + [self.scratch count]] = read_buf[x];
+    }
+    
+    // Clear scratch and read buffers
+    self.scratch = [[NSMutableArray alloc] init];
+    free(read_buf);
     
     size_t seek_pos = 0;
-    const size_t len = num_read + [self.scratch count];
     
     if (self.state == Start)
     {
+        NSLog(@"reading for frame start");
         [self readForFrameStart:buf withOffset:&seek_pos toLen:len];
     }
     
     if (self.state == PayloadLen)
     {
+        NSLog(@"reading for payload len");
         [self readPayloadLength:buf withOffset:&seek_pos toLen:len];
     }
     
     if (self.state == Payload)
     {
+        NSLog(@"reading for payload");
         [self readPayload:buf withOffset:&seek_pos toLen:len];
     }
     
     if (self.state == End)
     {
+        NSLog(@"reading for frame end");
         [self readForFrameEnd:buf withOffset:seek_pos toLen:len];
     }
     
@@ -201,6 +216,7 @@
         const uint8_t expected_end_byte = buf[offset];
         if (expected_end_byte == FRAME_END)
         {
+            NSLog(@"found frame end");
             const size_t payload_len = [self payloadLen];
             uint8_t *payload = calloc(payload_len, sizeof(uint8_t));
             for (int x = 3; x < [self.buffer count]; x++)
@@ -236,14 +252,15 @@
             [self.scratch addObject:[NSNumber numberWithUnsignedChar:buf[x]]];
         }
     }
+    NSLog(@"Unable to find frame end :(");
     return;
 }
 
 - (uint16_t) payloadLen
 {
     const uint16_t mask = 0xFFFF;
-    uint16_t len = ((uint16_t)self.buffer[1] << 8) & mask;
-    len = len | (uint16_t)self.buffer[2];
+    uint16_t len = (((uint16_t)[self.buffer[1] intValue]) << 8) & mask;
+    len = len | ((uint16_t)[self.buffer[2] intValue]);
     return len;
 }
 

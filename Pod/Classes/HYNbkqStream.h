@@ -23,6 +23,7 @@
 // Called when connection to host has been lost
 - (void)onDisconnected;
 // Called when data is received from host
+// It is the callers responsibility to free buffer
 - (void)onDataReceived:(const uint8_t *)buffer withLen:(const size_t)len;
 // Called when an error has been encountered
 - (void)onError:(HydrogenResult)error;
