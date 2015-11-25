@@ -46,6 +46,7 @@ NSData *buffer = [[NSData alloc] initWithBytes:ping length:4];
 - (void)onDataReceived:(const uint8_t *)buffer withLen:(const size_t)len
 {
     NSLog(@"onDataReceived");
+    // Consumer is responsible for freeing buffer
 }
 
 // Called when an error has been encountered

@@ -19,15 +19,16 @@
 
 @interface HYNbkqStream ()
 
-@property (nonatomic) ReadState state;
+@property (nonatomic) FrameState state;
 @property (nonatomic) NSInputStream *inputStream;
 @property (nonatomic) NSOutputStream *outputStream;
-@property (nonatomic) HYReadBuffer *buffer;
+@property (nonatomic) NSMutableArray *buffer;
+@property (nonatomic) NSMutableArray *scratch;
 @property (nonatomic) id<HYNbkqStream> streamDelegate;
 
 // NSStreamEvent likes to send a notification for each side of the
 // stream (in and out), this is here to provide a count so that the
-// end user only gets one call back called once the both streams are connected
+// end user only gets one callback called once both streams are connected
 @property (nonatomic) uint8_t streamsConnected;
 
 @end
@@ -55,8 +56,9 @@
             NSLog(@"Error opening streams, terminating...");
             NSParameterAssert(NULL);
         }
-        self.state = PayloadLen;
-        self.buffer = [[HYReadBuffer alloc] init];
+        self.state = Start;
+        self.buffer = [[NSMutableArray alloc] init];
+        self.scratch = [[NSMutableArray alloc] init];
         self.streamDelegate = delegate;
     }
     
@@ -102,67 +104,166 @@
 
 - (void)read
 {
-    const unsigned short count = [self.buffer remaining];
-    uint8_t buffer[count];
-    int numRead = (int)[self.inputStream read:buffer maxLength:count];
-    
-    if (numRead < 0)
+    uint8_t *tbuf = calloc(512, sizeof(uint8_t));
+    const int num_read = [self.inputStream read:tbuf maxLength:512];
+    if (num_read < 0)
     {
         [self.streamDelegate onError:E_ON_READ];
     }
-    
-    if (numRead == 0)
+    if (num_read == 0)
     {
         [self.streamDelegate onError:E_EOF];
     }
     
-    for (int x = 0; x < numRead; x++)
+    uint8_t *buf = calloc([self.scratch count] + num_read, sizeof(uint8_t));
+    for (int x = 0; x < [self.scratch count]; x++)
     {
-        [self.buffer push:buffer[x]];
+        buf[x] = self.scratch[x];
+    }
+    memcpy(buf + [self.scratch count], tbuf, num_read);
+    free(tbuf);
+    
+    size_t seek_pos = 0;
+    const uint32_t len = num_read + [self.scratch count];
+    
+    if (self.state == Start)
+    {
+        [self readForFrameStart:buf withOffset:&seek_pos toLen:len];
     }
     
-    if ([self.buffer remaining] == 0)
+    if (self.state == PayloadLen)
     {
-        if (self.state == PayloadLen)
+        [self readPayloadLength:buf withOffset:&seek_pos toLen:len];
+    }
+    
+    if (self.state == Payload)
+    {
+        [self readPayload:buf withOffset:&seek_pos toLen:len];
+    }
+    
+    if (self.state == End)
+    {
+        [self readForFrameEnd:buf withOffset:seek_pos toLen:len];
+    }
+    
+    free(buf);
+}
+
+- (void)readForFrameStart:(const uint8_t *)buf withOffset:(size_t *)offset toLen:(const size_t)len
+{
+    while (*offset < len)
+    {
+        if (buf[*offset] == FRAME_START)
         {
-            [self.buffer calcPayloadLen];
-            uint16_t payloadLen = [self.buffer payloadLen];
-            [self.buffer setCapacity:payloadLen];
-            self.state = Payload;
-        }
-        else
-        {
-            [self.buffer reset];
+            [self.buffer addObject:[NSNumber numberWithUnsignedChar:buf[*offset]]];
             self.state = PayloadLen;
-            
-            NSArray *internalBuffer = [self.buffer drainQueue];
-            if ([internalBuffer count] != 1)
+            *offset += 1;
+            break;
+        }
+        *offset += 1;
+    }
+}
+
+- (void)readPayloadLength:(const uint8_t *)buf withOffset:(size_t *)offset toLen:(const size_t)len
+{
+    while (*offset < len)
+    {
+        [self.buffer addObject:[NSNumber numberWithUnsignedChar:buf[*offset]]];
+        if ([self.buffer count] == 3)
+        {
+            self.state = Payload;
+            *offset += 1;
+            break;
+        }
+        *offset += 1;
+    }
+}
+
+- (void)readPayload:(const uint8_t *)buf withOffset:(size_t *)offset toLen:(const size_t)len
+{
+    while (*offset < len)
+    {
+        [self.buffer addObject:[NSNumber numberWithUnsignedChar:buf[*offset]]];
+        if ([self.buffer count] == [self payloadLen] + 3)
+        {
+            self.state = End;
+            *offset += 1;
+            break;
+        }
+        *offset += 1;
+    }
+}
+
+- (void)readForFrameEnd:(const uint8_t *)buf withOffset:(size_t)offset toLen:(const size_t)len
+{
+    if (offset < len)
+    {
+        const uint8_t expected_end_byte = buf[offset];
+        if (expected_end_byte == FRAME_END)
+        {
+            const size_t payload_len = [self payloadLen];
+            uint8_t *payload = calloc(payload_len, sizeof(uint8_t));
+            for (int x = 3; x < [self.buffer count]; x++)
             {
-                NSLog(@"Error - reading completed but internal buffer was not equal to one...?");
-                NSParameterAssert(NULL);
+                payload[x - 3] = self.buffer[x];
             }
-            NSData *internalPayload = (NSData *)internalBuffer[0];
-            [self.streamDelegate onDataReceived:(const uint8_t *)[internalPayload bytes]
-                                        withLen:(const size_t)[internalPayload length]];
+            self.state = Start;
+            self.buffer = [[NSMutableArray alloc] init];
+            
+            // Dump remaining into scratch space
+            offset++;
+            self.scratch = [[NSMutableArray alloc] init];
+            for (int x = offset; x < len; x++)
+            {
+                [self.scratch addObject:[NSNumber numberWithUnsignedChar:buf[x]]];
+            }
+            
+            // Do all the callbacks and shit
+            [self.streamDelegate onDataReceived:payload
+                                        withLen:payload_len];
+            return;
+        }
+        
+        // If we're here, the frame was wrong. Maybe our fault, who knows?
+        // Either way, we're going to reset and try to start again from the start byte.
+        // We need to dump whatever is left in the buffer into our scratch because it
+        // might be in there?
+        self.state = Start;
+        self.buffer = [[NSMutableArray alloc] init];
+        self.scratch = [[NSMutableArray alloc] init];
+        for (int x = offset; x < len; x++)
+        {
+            [self.scratch addObject:[NSNumber numberWithUnsignedChar:buf[x]]];
         }
     }
+    return;
+}
+
+- (uint16_t) payloadLen
+{
+    const uint16_t mask = 0xFFFF;
+    uint16_t len = ((uint16_t)self.buffer[1] << 8) & mask;
+    len = len | (uint16_t)self.buffer[2];
+    return len;
 }
 
 - (void)write:(NSData *)buffer
 {
-    uint8_t *nBuffer = (uint8_t *)calloc(buffer.length + 2, sizeof(uint8_t));
+    uint8_t *nBuffer = (uint8_t *)calloc(buffer.length + 4, sizeof(uint8_t));
     uint8_t *nBufferOrigin = nBuffer;
-    nBuffer[0] = (uint16_t)buffer.length & 0xFFFF << 8;
-    nBuffer[1] = (uint16_t)buffer.length & 0xFFFF;
+    nBuffer[0] = FRAME_START;
+    nBuffer[1] = (uint16_t)buffer.length & 0xFFFF << 8;
+    nBuffer[2] = (uint16_t)buffer.length & 0xFFFF;
     
     const uint8_t *bytes = [buffer bytes];
     for (int x = 0; x < buffer.length; x++)
     {
-        nBuffer[x + 2] = *(bytes + x);
+        nBuffer[x + 3] = *(bytes + x);
     }
+    nBuffer[buffer.length + 3] = FRAME_END;
     
     uint zeroWrittenAttempts = 0;
-    size_t bytesRemaining = buffer.length + 2;
+    size_t bytesRemaining = buffer.length + 4;
     while (bytesRemaining > 0)
     {
         int numWritten = (int)[self.outputStream write:nBuffer maxLength:bytesRemaining];

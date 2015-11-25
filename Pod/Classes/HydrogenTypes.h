@@ -15,14 +15,21 @@
 #ifndef Pods_HydrogenTypes_h
 #define Pods_HydrogenTypes_h
 
+#define FRAME_START 0x01
+#define FRAME_END   0x17
+
 // State pf current NSInputStream
 typedef enum
 {
-    // Stream is reading the payload len frame
+    // Reading for frame start
+    Start,
+    // Reading for payload len
     PayloadLen,
-    // Stream is reading the payload
-    Payload
-} ReadState;
+    // Reading payload
+    Payload,
+    // Reading for frame end byte
+    End
+} FrameState;
 
 // Represents the type of callbacks the client will execute
 typedef enum
