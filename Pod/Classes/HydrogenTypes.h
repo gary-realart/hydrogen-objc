@@ -6,10 +6,6 @@
 // distributed with this file, You can
 // obtain one at
 // http://mozilla.org/MPL/2.0/.
-//
-// This Source Code Form is "Incompatible
-// With Secondary Licenses", as defined by
-// the Mozilla Public License, v. 2.0.
 
 
 #ifndef Pods_HydrogenTypes_h
@@ -41,21 +37,6 @@ typedef enum
     // C style function pointers as callbacks
     EE_FUNCTION
 } ExecutionEnvironment;
-
-// Hydrogen log levels
-typedef enum
-{
-    // Fined grained log statements
-    L_TRACE,
-    // Less verbose than Trace, used for debugging
-    L_DEBUG,
-    // Standard information, could not problem solve at this level
-    L_INFO,
-    // Something unexpected happened, end users probably can't tell
-    L_WARN,
-    // Something unexpected happened, end users definitely know
-    L_ERROR
-} HydrogenLogLevel;
 
 // Hydrogen Errors
 typedef enum

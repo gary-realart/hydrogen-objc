@@ -6,10 +6,6 @@
 // distributed with this file, You can
 // obtain one at
 // http://mozilla.org/MPL/2.0/.
-//
-// This Source Code Form is "Incompatible
-// With Secondary Licenses", as defined by
-// the Mozilla Public License, v. 2.0.
 
 
 #import "HydrogenClient.h"
@@ -61,7 +57,7 @@
     return self;
 }
 
-- (id)initWithDataReceivedBlock:(void (^)(const uint8_t *, const size_t))dataReceivedBlock
+- (id)initWithDataReceivedBlock:(void (^)(NSData *))onDataReceivedBlock
               andOnConnectBlock:(void (^)())onConnectBlock
            andOnDisconnectBlock:(void (^)())onDisconnectBlock
                 andOnErrorBlock:(void (^)(HydrogenResult))onErrorBlock
@@ -72,7 +68,7 @@
         self.environment = EE_BLOCK;
         self.onConnectHandler = (__bridge void *)onConnectBlock;
         self.onDisconnectHandler = (__bridge void *)onDisconnectBlock;
-        self.onDataReceivedHandler = (__bridge void *)dataReceivedBlock;
+        self.onDataReceivedHandler = (__bridge void *)onDataReceivedBlock;
         self.onErrorHandler = (__bridge void *)onErrorBlock;
     }
     
@@ -81,6 +77,7 @@
 
 - (void)connectToHostWithAddress:(NSString *)hostAddress
                          andPort:(uint16_t)port
+                          useSSL:(BOOL)sslOption
 {
     CFReadStreamRef readStream;
     CFWriteStreamRef writeStream;
@@ -100,6 +97,12 @@
     
     inputStream = (__bridge_transfer NSInputStream *)readStream;
     outputStream = (__bridge_transfer NSOutputStream *)writeStream;
+    
+    if (sslOption)
+    {
+        [inputStream setProperty:NSStreamSocketSecurityLevelTLSv1 forKey:NSStreamSocketSecurityLevelKey];
+        [outputStream setProperty:NSStreamSocketSecurityLevelTLSv1 forKey:NSStreamSocketSecurityLevelKey];
+    }
     
     self.stream = [[HYNbkqStream alloc] initWithInputStream:inputStream
                                             andOutputStream:outputStream
@@ -167,14 +170,23 @@
     switch (self.environment)
     {
         case EE_BLOCK:
-            ((__bridge void (^)(const uint8_t *, const size_t))self.onDataReceivedHandler)(buffer, len);
+        {
+            NSData *data = [NSData dataWithBytesNoCopy:(void*)buffer length:len freeWhenDone:YES];
+            ((__bridge void (^)(NSData *))self.onDataReceivedHandler)(data);
             break;
+        }
         case EE_DELEGATE:
-            [self.hydrogenDelegate onDataReceived:buffer withLen:len];
+        {
+            NSData *data = [NSData dataWithBytesNoCopy:(void*)buffer length:len freeWhenDone:YES];
+            [self.hydrogenDelegate onDataReceived:data];
             break;
+        }
         case EE_FUNCTION:
+        {
             ((void (*)(const uint8_t *, const size_t len))self.onDataReceivedHandler)(buffer, len);
+            free((void *)buffer);
             break;
+        }
             
         default:
             NSLog(@"Environment: %d - something is not initialized...?", (int)self.environment);

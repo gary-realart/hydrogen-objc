@@ -6,10 +6,6 @@
 // distributed with this file, You can
 // obtain one at
 // http://mozilla.org/MPL/2.0/.
-//
-// This Source Code Form is "Incompatible
-// With Secondary Licenses", as defined by
-// the Mozilla Public License, v. 2.0.
 
 
 #import "HYNbkqStream.h"
@@ -139,25 +135,21 @@
     
     if (self.state == Start)
     {
-        NSLog(@"reading for frame start");
         [self readForFrameStart:buf withOffset:&seek_pos toLen:len];
     }
     
     if (self.state == PayloadLen)
     {
-        NSLog(@"reading for payload len");
         [self readPayloadLength:buf withOffset:&seek_pos toLen:len];
     }
     
     if (self.state == Payload)
     {
-        NSLog(@"reading for payload");
         [self readPayload:buf withOffset:&seek_pos toLen:len];
     }
     
     if (self.state == End)
     {
-        NSLog(@"reading for frame end");
         [self readForFrameEnd:buf withOffset:seek_pos toLen:len];
     }
     

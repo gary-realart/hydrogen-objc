@@ -13,10 +13,6 @@
 		6DC779EA76EEFAA513EAE8E3 /* Pods-hydrogen-objc_Tests-hydrogen-objc-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 60434C103AFE26F74EAEE6A4 /* Pods-hydrogen-objc_Tests-hydrogen-objc-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		71DEEBF31B7CE9960049B0FF /* HydrogenClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 71DEEBF11B7CE9960049B0FF /* HydrogenClient.h */; };
 		71DEEBF41B7CE9960049B0FF /* HydrogenClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 71DEEBF21B7CE9960049B0FF /* HydrogenClient.m */; };
-		71DEEBF71B7CEA450049B0FF /* HYMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 71DEEBF51B7CEA450049B0FF /* HYMessage.h */; };
-		71DEEBF81B7CEA450049B0FF /* HYMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 71DEEBF61B7CEA450049B0FF /* HYMessage.m */; };
-		71DEEBFB1B7CEB0B0049B0FF /* HYReadBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 71DEEBF91B7CEB0B0049B0FF /* HYReadBuffer.h */; };
-		71DEEBFC1B7CEB0B0049B0FF /* HYReadBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = 71DEEBFA1B7CEB0B0049B0FF /* HYReadBuffer.m */; };
 		71DEEBFF1B7CEB8D0049B0FF /* HYNbkqStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 71DEEBFD1B7CEB8D0049B0FF /* HYNbkqStream.h */; };
 		71DEEC001B7CEB8D0049B0FF /* HYNbkqStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 71DEEBFE1B7CEB8D0049B0FF /* HYNbkqStream.m */; };
 		71DEEC021B7CEC300049B0FF /* HydrogenTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 71DEEC011B7CEC300049B0FF /* HydrogenTypes.h */; };
@@ -55,10 +51,6 @@
 		6B7F0D5FFD3D1E0571DB5DBA /* Pods-hydrogen-objc_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-hydrogen-objc_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		71DEEBF11B7CE9960049B0FF /* HydrogenClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HydrogenClient.h; sourceTree = "<group>"; };
 		71DEEBF21B7CE9960049B0FF /* HydrogenClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HydrogenClient.m; sourceTree = "<group>"; };
-		71DEEBF51B7CEA450049B0FF /* HYMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HYMessage.h; sourceTree = "<group>"; };
-		71DEEBF61B7CEA450049B0FF /* HYMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HYMessage.m; sourceTree = "<group>"; };
-		71DEEBF91B7CEB0B0049B0FF /* HYReadBuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HYReadBuffer.h; sourceTree = "<group>"; };
-		71DEEBFA1B7CEB0B0049B0FF /* HYReadBuffer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HYReadBuffer.m; sourceTree = "<group>"; };
 		71DEEBFD1B7CEB8D0049B0FF /* HYNbkqStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HYNbkqStream.h; sourceTree = "<group>"; };
 		71DEEBFE1B7CEB8D0049B0FF /* HYNbkqStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HYNbkqStream.m; sourceTree = "<group>"; };
 		71DEEC011B7CEC300049B0FF /* HydrogenTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HydrogenTypes.h; sourceTree = "<group>"; };
@@ -117,10 +109,6 @@
 			children = (
 				71DEEBF11B7CE9960049B0FF /* HydrogenClient.h */,
 				71DEEBF21B7CE9960049B0FF /* HydrogenClient.m */,
-				71DEEBF51B7CEA450049B0FF /* HYMessage.h */,
-				71DEEBF61B7CEA450049B0FF /* HYMessage.m */,
-				71DEEBF91B7CEB0B0049B0FF /* HYReadBuffer.h */,
-				71DEEBFA1B7CEB0B0049B0FF /* HYReadBuffer.m */,
 				71DEEBFD1B7CEB8D0049B0FF /* HYNbkqStream.h */,
 				71DEEBFE1B7CEB8D0049B0FF /* HYNbkqStream.m */,
 				71DEEC011B7CEC300049B0FF /* HydrogenTypes.h */,
@@ -241,11 +229,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				CADDC3298BC447C0097D7AB0 /* Pods-hydrogen-objc_Tests-umbrella.h in Headers */,
-				71DEEBF71B7CEA450049B0FF /* HYMessage.h in Headers */,
 				71DEEBF31B7CE9960049B0FF /* HydrogenClient.h in Headers */,
 				71DEEBFF1B7CEB8D0049B0FF /* HYNbkqStream.h in Headers */,
 				71DEEC021B7CEC300049B0FF /* HydrogenTypes.h in Headers */,
-				71DEEBFB1B7CEB0B0049B0FF /* HYReadBuffer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -356,9 +342,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71DEEBFC1B7CEB0B0049B0FF /* HYReadBuffer.m in Sources */,
 				71DEEBF41B7CE9960049B0FF /* HydrogenClient.m in Sources */,
-				71DEEBF81B7CEA450049B0FF /* HYMessage.m in Sources */,
 				71DEEC001B7CEB8D0049B0FF /* HYNbkqStream.m in Sources */,
 				65F3CC1C8F4277862D5D04AA /* Pods-hydrogen-objc_Tests-dummy.m in Sources */,
 			);

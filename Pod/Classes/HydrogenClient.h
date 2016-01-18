@@ -6,10 +6,6 @@
 // distributed with this file, You can
 // obtain one at
 // http://mozilla.org/MPL/2.0/.
-//
-// This Source Code Form is "Incompatible
-// With Secondary Licenses", as defined by
-// the Mozilla Public License, v. 2.0.
 
 
 #import <Foundation/Foundation.h>
@@ -24,7 +20,7 @@
 // Called when connection to host has been lost
 - (void)onDisconnected;
 // Called when data is received from host
-- (void)onDataReceived:(const uint8_t *)buffer withLen:(const size_t)len;
+- (void)onDataReceived:(NSData *)data;
 // Called when an error has been encountered
 - (void)onError:(HydrogenResult)error;
 
@@ -41,14 +37,15 @@
 // Initializes the client with Obj-C style delegate/protocol messaging
 - (id)initWithHydrogenDelegate:(id<Hydrogen>)delegate;
 // Initializes the client with Obj-C style blocks
-- (id)initWithDataReceivedBlock:(void (^)(const uint8_t *, const size_t))dataReceivedBlock
+- (id)initWithDataReceivedBlock:(void (^)(NSData *))onDataReceivedBlock
               andOnConnectBlock:(void (^)())onConnectBlock
            andOnDisconnectBlock:(void (^)())onDisconnectBlock
                 andOnErrorBlock:(void (^)(HydrogenResult))onErrorBlock;
 // Attempts to connect to the given Ipv4 address and port
 // On failure, the onError callback is called
 - (void)connectToHostWithAddress:(NSString *)hostAddress
-                         andPort:(uint16_t)port;
+                         andPort:(uint16_t)port
+                          useSSL:(BOOL)sslOption;
 // Attempts to write the complete buffer to the stream
 // On failure E_ON_WRITE error is returned
 - (void)writeData:(NSData *)buffer;
