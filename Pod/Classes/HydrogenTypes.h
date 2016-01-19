@@ -34,8 +34,6 @@ typedef enum
     EE_BLOCK,
     // Obj-C style delegates as callbacks
     EE_DELEGATE,
-    // C style function pointers as callbacks
-    EE_FUNCTION
 } ExecutionEnvironment;
 
 // Hydrogen Errors

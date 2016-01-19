@@ -15,10 +15,10 @@
 @interface HydrogenClient ()
 
 @property (nonatomic) id<Hydrogen> hydrogenDelegate;
-@property (nonatomic) void *onConnectHandler;
-@property (nonatomic) void *onDisconnectHandler;
-@property (nonatomic) void *onDataReceivedHandler;
-@property (nonatomic) void *onErrorHandler;
+@property (nonatomic, strong) void (^onConnectHandler)();
+@property (nonatomic, strong) void (^onDisconnectHandler)();
+@property (nonatomic, strong) void (^onDataReceivedHandler)(NSData *);
+@property (nonatomic, strong) void (^onErrorHandler)(HydrogenResult);
 @property (nonatomic) ExecutionEnvironment environment;
 @property (nonatomic) HYNbkqStream *stream;
 
@@ -27,7 +27,7 @@
 
 @implementation HydrogenClient
 
-- (id)initWithDataReceivedFunction:(void (*)(const uint8_t *, const size_t len))dataReceivedFunction
+- (id)initWithDataReceivedFunction:(void (*)(const uint8_t *, const size_t))dataReceivedFunction
               andOnConnectFunction:(void (*)())onConnectFunction
            andOnDisconnectFunction:(void (*)())onDisconnectFunction
                 andOnErrorFunction:(void (*)(HydrogenResult))onErrorFunction
@@ -35,11 +35,13 @@
     self = [super init];
     if (self)
     {
-        self.environment = EE_FUNCTION;
-        self.onConnectHandler = (void *)onConnectFunction;
-        self.onDisconnectHandler = (void *)onDisconnectFunction;
-        self.onDataReceivedHandler = (void *)dataReceivedFunction;
-        self.onErrorHandler = (void *)onErrorFunction;
+        self.environment = EE_BLOCK;
+        self.onConnectHandler = ^() { onConnectFunction(); };
+        self.onDisconnectHandler = ^() { onDisconnectFunction(); };
+        self.onDataReceivedHandler = ^(NSData *data) {
+            dataReceivedFunction((const uint8_t *)[data bytes], (const size_t)[data length]);
+        };
+        self.onErrorHandler = ^(HydrogenResult result) { onErrorFunction(result); };
     }
     
     return self;
@@ -66,10 +68,10 @@
     if (self)
     {
         self.environment = EE_BLOCK;
-        self.onConnectHandler = (__bridge void *)onConnectBlock;
-        self.onDisconnectHandler = (__bridge void *)onDisconnectBlock;
-        self.onDataReceivedHandler = (__bridge void *)onDataReceivedBlock;
-        self.onErrorHandler = (__bridge void *)onErrorBlock;
+        self.onConnectHandler = onConnectBlock;
+        self.onDisconnectHandler = onDisconnectBlock;
+        self.onDataReceivedHandler = onDataReceivedBlock;
+        self.onErrorHandler = onErrorBlock;
     }
     
     return self;
@@ -130,13 +132,10 @@
     switch (self.environment)
     {
         case EE_BLOCK:
-            ((__bridge void (^)())self.onConnectHandler)();
+            self.onConnectHandler();
             break;
         case EE_DELEGATE:
             [self.hydrogenDelegate onConnected];
-            break;
-        case EE_FUNCTION:
-            ((void (*)())self.onConnectHandler)();
             break;
             
         default:
@@ -150,13 +149,10 @@
     switch (self.environment)
     {
         case EE_BLOCK:
-            ((__bridge void (^)())self.onDisconnectHandler)();
+            self.onDisconnectHandler();
             break;
         case EE_DELEGATE:
             [self.hydrogenDelegate onDisconnected];
-            break;
-        case EE_FUNCTION:
-            ((void (*)())self.onDisconnectHandler)();
             break;
             
         default:
@@ -172,19 +168,13 @@
         case EE_BLOCK:
         {
             NSData *data = [NSData dataWithBytesNoCopy:(void*)buffer length:len freeWhenDone:YES];
-            ((__bridge void (^)(NSData *))self.onDataReceivedHandler)(data);
+            self.onDataReceivedHandler(data);
             break;
         }
         case EE_DELEGATE:
         {
             NSData *data = [NSData dataWithBytesNoCopy:(void*)buffer length:len freeWhenDone:YES];
             [self.hydrogenDelegate onDataReceived:data];
-            break;
-        }
-        case EE_FUNCTION:
-        {
-            ((void (*)(const uint8_t *, const size_t len))self.onDataReceivedHandler)(buffer, len);
-            free((void *)buffer);
             break;
         }
             
@@ -199,13 +189,10 @@
     switch (self.environment)
     {
         case EE_BLOCK:
-            ((__bridge void (^)())self.onErrorHandler)(error);
+            self.onErrorHandler(error);
             break;
         case EE_DELEGATE:
             [self.hydrogenDelegate onError:error];
-            break;
-        case EE_FUNCTION:
-            ((void (*)())self.onErrorHandler)(error);
             break;
             
         default:
